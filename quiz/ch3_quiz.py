@@ -28,6 +28,13 @@ print(f"Result for p7: {Twist_a}")
 T_sa_log = mr.MatrixLog6(T_sa)
 print(T_sa_log)
 
+
+# P8
+T_sa_log = mr.MatrixLog6(T_sa)
+T_sa_vec = mr.se3ToVec(T_sa_log)
+
+T_sa_ang = mr.AxisAng6(T_sa_vec)
+print(f"result for P8: {T_sa_ang}")
 # P9
 P9_vec = np.array([0,1,2,3,0,0]).T
 P9_se3 = mr.VecTose3(P9_vec)
