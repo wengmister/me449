@@ -22,3 +22,5 @@ J_B_subbed = J_B.subs({L1:1 , L2:2, L3:3, L4:4})
 # find rank of body jacobian
 print(J_B)
 print(f"Rank of body jacobian: {J_B_subbed.rank()}")
+# Rank here is 3 since it's possible to weight the 3 joints j2, j4, j6 to cancel out each other.
+# In this case, the weights are just joint velocities. Any 2 combinations of them can span the space.
