@@ -14903,7 +14903,7 @@ $$</p>
 <p>This yields constant joint speeds for all joints in the robot.</p>
 <h3 id="2-(b):">2 (b):<a class="anchor-link" href="#2-(b):">&#182;</a></h3><p>In order to achieve a constant end-effector twist $V_{ee}$, we first find the twist required to move from $T^0$ to $T_{sb}$:
 $$
-V_{ee} = vec(log(T^0 - T_{sb}))/t_f
+V_{ee} = vec(log(T^0) - log(T_{sb}))/t_f
 $$</p>
 <p>Now, this end-effector $V_{ee}$ can be achieved through:
 $$
@@ -14915,11 +14915,11 @@ $$
 $$</p>
 <p>Specifically, at time t=0:
 $$
-\dot{\theta}_{t=0} = J_{b}(\theta_0)^{-1} vec(log(T^0 - T_{sb}))/t_f
+\dot{\theta}_{t=0} = J_{b}(\theta_0)^{-1} vec(log(T^0) - log(T_{sb}))/t_f
 $$</p>
 <p>And at time t = $t_f/2$:
 $$
-\dot{\theta}_{t=t_f/2} = J_{b}(\theta_{t_f/2})^{-1} vec(log(T^0 - T_{sb}))/t_f
+\dot{\theta}_{t=t_f/2} = J_{b}(\theta_{t_f/2})^{-1} vec(log(T^0) - log(T_{sb}))/t_f
 $$</p>
 <h3 id="2-(c):">2 (c):<a class="anchor-link" href="#2-(c):">&#182;</a></h3><p>Since approach in (a) has more direct control over joint velocities, it's less likely for it to violate any joint velocity limit - where as the approach in (b) derives joint velocity as a function of the end-effector twist, it's possible to yield something that the robot joint actuator cannot achieve.</p>
 <p>However, it's also possible for appoach (a) to yield an end-effector twist that's dangerous since it's agnostic of the resulting end-effector twist, which could be dangerous in a real robot. Approach (b) avoids this issue since it directly controls the end-effector twist.</p>
