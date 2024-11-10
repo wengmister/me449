@@ -126,6 +126,7 @@ def puppet_q3(thetalist, dthetalist, g, Mlist, Slist, Glist, t, dt, damping, sti
 
     for i in tqdm(range(N)):
         # Calculate damping
+        print(f"Iteration {i}")
         tau_damping = - damping * dthetalist
         # Calculate spring force
         spring_force_vec = calculate_spring_wrench(thetalist, Slist, stiffness, restLength, referencePos_q3(i*dt))
@@ -162,31 +163,33 @@ def calculate_spring_wrench(thetalist, Slist, stiffness, restLength, springPos):
         Mlist (np.array): 8 frames of link configuration at home pose
         stiffness (float): spring stiffness coefficient (N/m)
         restLength (float): length of the spring at rest (m)
+        springPOs (np.array): 3-vector of spring position in {s} frame
     Returns:
         np.array: 6-vector of spring forces and torque acting on the robot. Expressed in end-effector frame.
     """
     # Get end effector transformation matrix for current configuration
 
     eePos = mr.FKinSpace(ur5.M_EE, Slist, thetalist)
-    # print(f"eePos = {eePos}")
+    print(f"eePos = {eePos}")
     # Extract position vector (first 3 elements of last column)
     p = np.array(eePos[:3,3])
 
     # Calculate spring length
     spring_length = np.linalg.norm(p - springPos) - restLength
-    # print(f"spring_length = {spring_length}")
-    # print(f"expected spring force = {stiffness * spring_length}")
+    print(f"spring_length = {spring_length}")
+    print(f"expected spring force = {stiffness * spring_length}")
 
     # Calculate spring force vector in {s} frame
-    spring_force = stiffness * spring_length * (p - springPos) / np.linalg.norm(p - springPos)
-    # print(f"spring_force = {spring_force}")
+    spring_force = stiffness * spring_length * (springPos - p) / np.linalg.norm(p - springPos)
+    print(f"spring_force = {spring_force}")
+    print(f"norm = {np.linalg.norm(spring_force)}")
 
-    # Convert to end effector frame
-    spring_force_ee = eePos @ np.array([*spring_force, 0]).T
-    # print(f"spring_force_ee = {spring_force_ee}")
+    # Convert to end effector frame: T_{ee}^{s} * F_{s}
+    spring_force_ee = mr.TransInv(eePos) @ np.array([*spring_force, 1]).T
+    print(f"spring_force_ee = {spring_force_ee}")
+    print(f"norm = {np.linalg.norm(spring_force_ee[:3])}")
 
     spring_wrench_ee = np.array([0, 0, 0, *spring_force_ee[:3]])
-
     return spring_wrench_ee
 
 def compute_hamiltonian(thetalist, dthetalist, g, Mlist, Glist, Slist):
@@ -254,8 +257,8 @@ if __name__ == "__main__":
 
     # test spring wrench
     # print(calculate_spring_wrench(q3_thetalist0, ur5.Slist, 100, 1, np.array([0, 1, 1])))
-    q3_thetamat, _ = puppet_q3(q3_thetalist0, q3_dthetalist0, g_q3, ur5.Mlist, ur5.Slist, ur5.Glist, 10, 0.01, 0, 1, 1)
-    print(q3_thetamat)
+    q3_thetamat, _ = puppet_q3(q3_thetalist0, q3_dthetalist0, g_q3, ur5.Mlist, ur5.Slist, ur5.Glist, 0.2, 0.01, 0, 1, 1)
+    # print(q3_thetamat)
 
     # q1_thetamat, _ , q1_hmat, q1_tmat, q1_vmat = puppet_q1(q1_thetalist0, q1_dthetalist0, g, ur5.Mlist, ur5.Slist, ur5.Glist, 5, 0.1, 0, 0, 0)
     # print(q1_thetamat.shape)
@@ -265,3 +268,6 @@ if __name__ == "__main__":
     # plt.plot(q1_vmat, label = "Potential Energy")
     # plt.legend()
     # plt.show()
+
+
+mr.TransInv
