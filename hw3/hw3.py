@@ -96,7 +96,53 @@ def puppet_q2(thetalist, dthetalist, g, Mlist, Slist, Glist, t, dt, damping, sti
     
     return thetamat, dthetamat
 
-def referencePos(t):
+def puppet_q3(thetalist, dthetalist, g, Mlist, Slist, Glist, t, dt, damping, stiffness, restLength):
+    """
+    Simulate a robot under damping and spring reaction. Q3: Adding a static spring.
+
+    Args:
+        thetalist (np.array): n-vector of initial joint angles (rad)
+        dthetalist (np.array): n-vector of initial joint velocities (rad/s)
+        g (np.array): 3-vector of gravity in s frame (m/s^2)
+        Mlist (np.array): 8 frames of link configuration at home pose
+        Slist (np.array): 6-vector of screw axes at home configuration
+        Glist (np.array): Spatial inertia matrices of the links
+        t (float): total simulation time (s)
+        dt (float): simulation time step (s)
+        damping (float): viscous damping coefficient (Nmn/rad)
+        stiffness (float): spring stiffness coefficient (N/m)
+        restLength (float): length of the spring at rest (m)
+    Returns:
+        thetamat (np.array): N x n matrix of joint angles (rad). Each row is a set of joint angles
+        dthetamat (np.array): N x n matrix of joint velocities (rad/s). Each row is a set of joint velocities
+    """
+    # Initialize 
+    N = int(t/dt)
+    n = len(thetalist)
+    thetamat = np.zeros((N + 1, n))
+    dthetamat = np.zeros((N + 1, n))
+    thetamat[0] = thetalist
+    dthetamat[0] = dthetalist
+
+    for i in tqdm(range(N)):
+        # Calculate damping
+        tau_damping = - damping * dthetalist
+        # Calculate spring force
+        spring_force_vec = calculate_spring_wrench(thetalist, Slist, stiffness, restLength, referencePos_q3(i*dt))
+        print(spring_force_vec)
+        # Forward dynamics
+        i_acc = mr.ForwardDynamics(thetalist, dthetalist, tau_damping, g, spring_force_vec, Mlist, Glist, Slist) 
+        i_pos, i_vel = mr.EulerStep(thetalist, dthetalist, i_acc, dt)
+        thetamat[i + 1] = i_pos
+        dthetamat[i + 1] = i_vel
+
+        # Update
+        thetalist = i_pos
+        dthetalist = i_vel
+    
+    return thetamat, dthetamat
+
+def referencePos_q3(t):
     """
     Generate a reference position for springPos 
 
@@ -105,7 +151,43 @@ def referencePos(t):
     Returns:
         np.array: 3-vector of reference position
     """
-    return np.array([0, 0, 0])
+    return np.array([0, 1, 1])
+
+def calculate_spring_wrench(thetalist, Slist, stiffness, restLength, springPos):
+    """
+    Calculate the 6-vector spring wrench acting on the end-effector.
+
+    Args:
+        thetalist (np.array): n-vector of joint angles (rad)
+        Mlist (np.array): 8 frames of link configuration at home pose
+        stiffness (float): spring stiffness coefficient (N/m)
+        restLength (float): length of the spring at rest (m)
+    Returns:
+        np.array: 6-vector of spring forces and torque acting on the robot. Expressed in end-effector frame.
+    """
+    # Get end effector transformation matrix for current configuration
+
+    eePos = mr.FKinSpace(ur5.M_EE, Slist, thetalist)
+    # print(f"eePos = {eePos}")
+    # Extract position vector (first 3 elements of last column)
+    p = np.array(eePos[:3,3])
+
+    # Calculate spring length
+    spring_length = np.linalg.norm(p - springPos) - restLength
+    # print(f"spring_length = {spring_length}")
+    # print(f"expected spring force = {stiffness * spring_length}")
+
+    # Calculate spring force vector in {s} frame
+    spring_force = stiffness * spring_length * (p - springPos) / np.linalg.norm(p - springPos)
+    # print(f"spring_force = {spring_force}")
+
+    # Convert to end effector frame
+    spring_force_ee = eePos @ np.array([*spring_force, 0]).T
+    # print(f"spring_force_ee = {spring_force_ee}")
+
+    spring_wrench_ee = np.array([0, 0, 0, *spring_force_ee[:3]])
+
+    return spring_wrench_ee
 
 def compute_hamiltonian(thetalist, dthetalist, g, Mlist, Glist, Slist):
     """
@@ -161,26 +243,25 @@ def compute_hamiltonian(thetalist, dthetalist, g, Mlist, Glist, Slist):
 
 
 if __name__ == "__main__":
-    print(np.zeros(6))
 
-    q1_thetalist0 = np.array([0, 0, 0, 0, 0, 0])
-    q1_dthetalist0 = np.array([0, 0, 0, 0, 0, 0])
-    g = np.array([0, 0, -9.81])
+    # q1_thetalist0 = np.array([0, 0, 0, 0, 0, 0])
+    # q1_dthetalist0 = np.array([0, 0, 0, 0, 0, 0])
+    # g = np.array([0, 0, -9.81])
 
-    print(f"test{np.array(ur5.Slist)[:, 1]}")
+    q3_thetalist0 = np.array([0, 0, 0, 0, 0, 0])
+    q3_dthetalist0 = np.array([0, 0, 0, 0, 0, 0])
+    g_q3 = np.array([0, 0, 0])
 
-    print("thetalist shape:", q1_thetalist0.shape)
-    print("dthetalist shape:", q1_dthetalist0.shape)
-    print("g shape:", g.shape)
-    print("Mlist individual shapes:", [np.array(M).shape for M in ur5.Mlist])
-    print("Slist shape:", len(ur5.Slist))
-    print("Glist individual shapes:", [G.shape for G in ur5.Glist])
+    # test spring wrench
+    # print(calculate_spring_wrench(q3_thetalist0, ur5.Slist, 100, 1, np.array([0, 1, 1])))
+    q3_thetamat, _ = puppet_q3(q3_thetalist0, q3_dthetalist0, g_q3, ur5.Mlist, ur5.Slist, ur5.Glist, 10, 0.01, 0, 1, 1)
+    print(q3_thetamat)
 
-    q1_thetamat, _ , q1_hmat, q1_tmat, q1_vmat = puppet_q1(q1_thetalist0, q1_dthetalist0, g, ur5.Mlist, ur5.Slist, ur5.Glist, 5, 0.01, 0, 0, 0)
-    print(q1_thetamat.shape)
-    plt.figure()
-    plt.plot(q1_hmat, label = "Hamiltonian")
-    plt.plot(q1_tmat, label = "Kinetic Energy")
-    plt.plot(q1_vmat, label = "Potential Energy")
-    plt.legend()
-    plt.show()
+    # q1_thetamat, _ , q1_hmat, q1_tmat, q1_vmat = puppet_q1(q1_thetalist0, q1_dthetalist0, g, ur5.Mlist, ur5.Slist, ur5.Glist, 5, 0.1, 0, 0, 0)
+    # print(q1_thetamat.shape)
+    # plt.figure()
+    # plt.plot(q1_hmat, label = "Hamiltonian")
+    # plt.plot(q1_tmat, label = "Kinetic Energy")
+    # plt.plot(q1_vmat, label = "Potential Energy")
+    # plt.legend()
+    # plt.show()

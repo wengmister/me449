@@ -43,3 +43,6 @@ class UR5:
                       [0,         0,         0,
                        0,  0.81725,        0],
                       [0,         0,     0.425,   0.81725,        0,  0.81725]]
+        self.M_EE = np.eye(4)
+        for i in range(len(self.Mlist)):
+            self.M_EE = self.M_EE @ np.array(self.Mlist[i])
