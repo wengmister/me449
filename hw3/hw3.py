@@ -57,7 +57,7 @@ def puppet_q1(thetalist, dthetalist, g, Mlist, Slist, Glist, t, dt, damping, sti
 
 def puppet_q2(thetalist, dthetalist, g, Mlist, Slist, Glist, t, dt, damping, stiffness, restLength):
     """
-    Simulate a robot under damping and spring reaction. Q2: Adding damping to robot
+    Simulate a robot under damping and spring reaction. Q2: Adding damping to robot. Damping causes a tau = - dtheta * damping
 
     Args:
         thetalist (np.array): n-vector of initial joint angles (rad)
@@ -84,7 +84,8 @@ def puppet_q2(thetalist, dthetalist, g, Mlist, Slist, Glist, t, dt, damping, sti
     dthetamat[0] = dthetalist
 
     for i in tqdm(range(N)):
-        i_acc = mr.ForwardDynamics(thetalist, dthetalist, np.zeros(n), g, np.zeros(n), Mlist, Glist, Slist) 
+        tau_damping = - damping * dthetalist
+        i_acc = mr.ForwardDynamics(thetalist, dthetalist, tau_damping, g, np.zeros(n), Mlist, Glist, Slist) 
         i_pos, i_vel = mr.EulerStep(thetalist, dthetalist, i_acc, dt)
         thetamat[i + 1] = i_pos
         dthetamat[i + 1] = i_vel
