@@ -14040,7 +14040,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -14584,7 +14584,7 @@ and damping you used.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[84]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">puppet_q3</span><span class="p">(</span><span class="n">thetalist</span><span class="p">,</span> <span class="n">dthetalist</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">Mlist</span><span class="p">,</span> <span class="n">Slist</span><span class="p">,</span> <span class="n">Glist</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">damping</span><span class="p">,</span> <span class="n">stiffness</span><span class="p">,</span> <span class="n">restLength</span><span class="p">):</span>
@@ -14671,7 +14671,7 @@ and damping you used.</p>
     <span class="c1"># print(f"expected spring force = {stiffness * spring_length}")</span>
 
     <span class="c1"># Calculate spring force vector in {s} frame</span>
-    <span class="n">spring_force</span> <span class="o">=</span> <span class="n">stiffness</span> <span class="o">*</span> <span class="n">spring_length</span> <span class="o">*</span> <span class="p">(</span><span class="n">springPos</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">springPos</span><span class="p">)</span>
+    <span class="n">spring_force</span> <span class="o">=</span> <span class="o">-</span> <span class="n">stiffness</span> <span class="o">*</span> <span class="n">spring_length</span> <span class="o">*</span> <span class="p">(</span><span class="n">springPos</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">springPos</span><span class="p">)</span>
     <span class="c1"># print(f"spring_force = {spring_force}")</span>
     <span class="c1"># print(f"norm = {np.linalg.norm(spring_force)}")</span>
 
@@ -14694,7 +14694,7 @@ and damping you used.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[86]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">q3_thetalist0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
@@ -14726,7 +14726,7 @@ and damping you used.</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>100%|██████████| 1000/1000 [00:07&lt;00:00, 129.35it/s]
+<pre>  0%|          | 0/1000 [00:00&lt;?, ?it/s]100%|██████████| 1000/1000 [00:07&lt;00:00, 131.99it/s]
 </pre>
 </div>
 </div>
@@ -14740,7 +14740,7 @@ and damping you used.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[87]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">q3_thetamat_damp</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">puppet_q3</span><span class="p">(</span><span class="n">q3_thetalist0</span><span class="p">,</span> <span class="n">q3_dthetalist0</span><span class="p">,</span> <span class="n">g_q3</span><span class="p">,</span> <span class="n">ur5</span><span class="o">.</span><span class="n">Mlist</span><span class="p">,</span> <span class="n">ur5</span><span class="o">.</span><span class="n">Slist</span><span class="p">,</span> <span class="n">ur5</span><span class="o">.</span><span class="n">Glist</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -14768,7 +14768,7 @@ and damping you used.</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>100%|██████████| 1000/1000 [00:07&lt;00:00, 130.94it/s]
+<pre>100%|██████████| 1000/1000 [00:07&lt;00:00, 133.29it/s]
 </pre>
 </div>
 </div>
@@ -14812,7 +14812,7 @@ the simulation</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[90]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">referencePos_q4</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
@@ -14892,7 +14892,7 @@ the simulation</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[91]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">q4_thetalist0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
@@ -14924,7 +14924,7 @@ the simulation</p>
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>100%|██████████| 1000/1000 [00:07&lt;00:00, 130.17it/s]
+<pre>100%|██████████| 1000/1000 [00:08&lt;00:00, 120.20it/s]
 </pre>
 </div>
 </div>

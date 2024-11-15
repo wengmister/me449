@@ -180,7 +180,7 @@ def calculate_spring_wrench(thetalist, Slist, stiffness, restLength, springPos):
     print(f"expected spring force = {stiffness * spring_length}")
 
     # Calculate spring force vector in {s} frame
-    spring_force = stiffness * spring_length * (springPos - p) / np.linalg.norm(p - springPos)
+    spring_force = - stiffness * spring_length * (springPos - p) / np.linalg.norm(p - springPos)
     print(f"spring_force = {spring_force}")
     print(f"norm = {np.linalg.norm(spring_force)}")
 
