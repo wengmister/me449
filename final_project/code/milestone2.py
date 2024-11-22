@@ -154,7 +154,7 @@ def main():
                           [-1, 0, 0, 0],
                           [0, 0, 0, 1]])
     test = TrajectoryGenerator(Tse_initial, Tsc_initial, Tsc_final, Tce_grasp, Tce_standoff, 2)
-    print(test)
+    # print(test)
     traj_to_csv(test, 'output.csv')
 
 if __name__ == "__main__":
