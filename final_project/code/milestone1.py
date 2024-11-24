@@ -84,5 +84,17 @@ if __name__ == "__main__":
     print(f"testing odom with input {test_speed}: {compute_odometry(test_speed)}")
     
     test_config = np.array([0,0,0,0,0,0,0,0,0,0,0,0])
-    test_joint_speed = np.array([10,10,50,50,0,5,0,5,0])
-    print(f"testing config with: {test_config}: {NextState(test_config, test_joint_speed, 0.1, 10)}")
+    test_joint_speed = np.array([6,3,5,4,1,5,3,5,2])
+    test_values = []
+
+    for i in range(100):
+        next_config = NextState(test_config, test_joint_speed, 0.1, 10)
+        print(f"testing config with: {test_config}: {next_config}")
+        test_config = next_config
+        test_values.append(next_config)
+
+    #plot all joint values
+    import matplotlib.pyplot as plt
+    test_values = np.array(test_values)
+    plt.plot(test_values[:,:])
+    plt.show()
