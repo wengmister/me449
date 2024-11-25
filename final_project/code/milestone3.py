@@ -14,7 +14,7 @@ def FeedbackControl(X, X_d, X_d_next, K_p, K_i, dt):
         dt (float): The time step
 
     Returns:
-        np.array: The control output
+        np.array: The control output 6-vector ee twist V
     """
     # Compute the error twist
     X_err = mr.se3ToVec(mr.MatrixLog6(np.dot(mr.TransInv(X), X_d)))
