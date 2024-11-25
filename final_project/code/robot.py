@@ -60,10 +60,6 @@ class Robot:
 
         # Assign the expanded matrix to F6
         self.F6 = expanded_F3
-        
-        # Apply a 45 degree rotation about the z-axis to the starting configuration
-        # This will hold the actual configuration of the ee.
-        self.Tse_actual = np.eye(4)
 
         # ee trajectory
         self.desired_ee_trajectory = []
@@ -75,8 +71,8 @@ class Robot:
         self.states_planned.append(self.state_actual)
 
         self.dt = 0.01
-        self.ki = np.eye(6) * 0.5
-        self.kp = np.eye(6)
+        self.ki = np.eye(6)
+        self.kp = np.eye(6) * 0.8
 
         self.xerr_history = []
         
@@ -158,14 +154,19 @@ if __name__=="__main__":
     robot = Robot()
     robot.plan_desired_trajectory()
     robot.execute_trajectory()
-    print(f"current Tse: {robot.get_current_Tse()}")
-    print(f"current jacobian: {robot.find_jacobian()}")
+    # print(f"current Tse: {robot.get_current_Tse()}")
+    # print(f"current jacobian: {robot.find_jacobian()}")
 
     plt.plot(robot.xerr_history)
     plt.legend(['w_x', 'w_y', 'w_z', 'v_x', 'v_y', 'v_z'])
+    plt.title('X_err history')
+    plt.xlabel('time (0.01s)')
+    plt.ylabel('error')
     plt.show()
 
-    traj_to_csv(robot.desired_ee_trajectory, 'desired.csv')
+    traj_to_csv(robot.xerr_history, 'x_err.csv')
+
+    # traj_to_csv(robot.desired_ee_trajectory, 'desired.csv')
     # print("Planned states:")
     # print(robot.states_planned)
     traj_to_csv(robot.states_planned, 'output.csv')
