@@ -67,8 +67,8 @@ def TrajectoryGenerator(Tse_initial, Tsc_initial, Tsc_final, Tce_grasp, Tce_stan
 
     fps = 0.01/k
     # Total frames = time / (0.01/k)
-    t_1 = 3
-    t_2 = 2
+    t_1 = 3.5
+    t_2 = 2.5
     t_3 = 0.7
     t_4 = 2
     t_5 = 3

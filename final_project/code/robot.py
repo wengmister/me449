@@ -1,6 +1,7 @@
 from milestone1 import *
 from milestone2 import *
 from milestone3 import *
+from tqdm import tqdm
 
 
 class Robot:
@@ -20,8 +21,8 @@ class Robot:
                                     [-1, 0, 0, 0.5],
                                     [0, 0, 0, 1]])
         
-        self.Tce_grasp = np.array([[0, 0, 1, 0],
-                                    [0, 1, 0, 0],
+        self.Tce_grasp = np.array([[0, 0, 1, -0.01],
+                                    [0, 1, 0, 0.02],
                                     [-1, 0, 0, -0.1],
                                     [0, 0, 0, 1]])
         
@@ -69,12 +70,12 @@ class Robot:
         self.actual_trajectory = []
 
         # youbot states
-        self.state_actual = [np.pi/4, -0.1, 0, 0, np.pi/10, -np.pi/2, np.pi/10, 0, 0, 0, 0, 0, 0]
+        self.state_actual = [np.pi/4, -0.2, 0.1, 0, np.pi/10, -np.pi/2, np.pi/10, 0, 0, 0, 0, 0, 0]
         self.states_planned = []
         self.states_planned.append(self.state_actual)
 
         self.dt = 0.01
-        self.ki = np.eye(6)*0.2
+        self.ki = np.eye(6) * 0.5
         self.kp = np.eye(6)
         
     def plan_desired_trajectory(self):
@@ -125,7 +126,7 @@ class Robot:
 
     def execute_trajectory(self):
         
-        for i in range(len(self.desired_ee_trajectory)-1):
+        for i in tqdm(range(len(self.desired_ee_trajectory)-1)):
             # print(i)
 
             # perform feedback control to get 6vector twist
