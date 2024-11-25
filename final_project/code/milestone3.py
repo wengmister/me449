@@ -30,7 +30,7 @@ def FeedbackControl(X, X_d, X_d_next, K_p, K_i, dt):
     # Compute the control output
     V = np.dot(ff_adj, V_d) + np.dot(K_p, X_err) + np.dot(K_i, X_err * dt)
     
-    return V
+    return V, X_err
 
 if __name__ == "__main__":
     # Define the current configuration
