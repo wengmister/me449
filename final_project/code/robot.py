@@ -56,7 +56,7 @@ class Robot:
         self.F3 = np.linalg.pinv(self.H0)
         # Expand self.F3 to a 6x4 matrix by padding with zeros
         expanded_F3 = np.zeros((6, 4))
-        expanded_F3[2:5, :self.F3.shape[1]] = self.F3
+        expanded_F3[2:5, :] = self.F3
 
         # Assign the expanded matrix to F6
         self.F6 = expanded_F3
@@ -66,7 +66,7 @@ class Robot:
         self.actual_trajectory = []
 
         # youbot states
-        self.state_actual = [np.pi/4, -0.2, 0.1, 0, np.pi/10, -np.pi/2, np.pi/10, 0, 0, 0, 0, 0, 0]
+        self.state_actual = [np.pi/4, -0.2, 0.1, 0, np.pi/10, -np.pi/2, np.pi/10, 0, 2, 2, 2, 2, 0]
         self.states_planned = []
         self.states_planned.append(self.state_actual)
 
@@ -144,7 +144,7 @@ class Robot:
             q_dot = np.dot(np.linalg.pinv(jac), V_output) # 4x u then 5x thetadot
 
             # Find the next actual state
-            state_output = NextState(self.state_actual, q_dot, self.dt, 1000)
+            state_output = NextState(self.state_actual, q_dot, self.dt, 500)
             state_output_with_gripper = np.append(state_output, self.desired_ee_trajectory[i][-1])
             self.states_planned.append(state_output_with_gripper)
             self.state_actual = state_output_with_gripper
@@ -162,6 +162,11 @@ if __name__=="__main__":
     plt.title('X_err history')
     plt.xlabel('time (0.01s)')
     plt.ylabel('error')
+    plt.show()
+
+    last_five_columns = np.array(robot.states_planned)[:, -5:]
+    print(last_five_columns)
+    plt.plot(last_five_columns)
     plt.show()
 
     traj_to_csv(robot.xerr_history, 'x_err.csv')

@@ -1,0 +1,4 @@
+zkweng@zkwmsr:~/me449(main)$ /bin/python3 /home/zkweng/me449/final_project/code/robot.py
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1639/1639 [00:01<00:00, 1326.24it/s]
+Data successfully saved to x_err.csv
+Data successfully saved to output.csv
