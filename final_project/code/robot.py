@@ -77,6 +77,8 @@ class Robot:
         self.dt = 0.01
         self.ki = np.eye(6) * 0.5
         self.kp = np.eye(6)
+
+        self.xerr_history = []
         
     def plan_desired_trajectory(self):
 
@@ -130,12 +132,14 @@ class Robot:
             # print(i)
 
             # perform feedback control to get 6vector twist
-            V_output = FeedbackControl(X= self.get_current_Tse(),
+            V_output, xerr_i = FeedbackControl(X= self.get_current_Tse(),
                                         X_d=pack_instance(self.desired_ee_trajectory[i][:-1]), 
                                         X_d_next=pack_instance(self.desired_ee_trajectory[i+1][:-1]), 
                                         K_p=self.kp, 
                                         K_i=self.ki,
                                         dt=self.dt)
+            
+            self.xerr_history.append(xerr_i)
 
             # find jacobian at this configuration and convert to joint values
             jac = self.find_jacobian()
@@ -156,6 +160,10 @@ if __name__=="__main__":
     robot.execute_trajectory()
     print(f"current Tse: {robot.get_current_Tse()}")
     print(f"current jacobian: {robot.find_jacobian()}")
+
+    plt.plot(robot.xerr_history)
+    plt.legend(['w_x', 'w_y', 'w_z', 'v_x', 'v_y', 'v_z'])
+    plt.show()
 
     traj_to_csv(robot.desired_ee_trajectory, 'desired.csv')
     # print("Planned states:")
