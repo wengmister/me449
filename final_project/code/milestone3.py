@@ -18,11 +18,11 @@ def FeedbackControl(X, X_d, X_d_next, K_p, K_i, dt):
     """
     # Compute the error twist
     X_err = mr.se3ToVec(mr.MatrixLog6(np.dot(mr.TransInv(X), X_d)))
-    print(f"X_err={X_err}")
+    # print(f"X_err={X_err}")
 
     # Compute feedforward twist
     V_d = mr.se3ToVec(mr.MatrixLog6(np.dot(mr.TransInv(X_d), X_d_next))) / dt
-    print(f"V_d={V_d}")
+    # print(f"V_d={V_d}")
 
     # Compute the feedforward 
     ff_adj = mr.Adjoint(np.dot(mr.TransInv(X), X_d))

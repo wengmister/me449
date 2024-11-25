@@ -31,6 +31,18 @@ def unpack(traj: list[np.array], gripper_state:int) -> list[np.array]:
 
     return unpacked
 
+def pack_instance(traj: np.array) -> list[np.array]:
+    """pack the a trajectory instance back into SE(3) matrix
+
+    Args:
+        traj (list[np.array]): a list of SE(3) matrices in list form
+    """
+    packed = np.array([[traj[0], traj[1], traj[2], traj[9]],
+                       [traj[3], traj[4], traj[5], traj[10]],
+                       [traj[6], traj[7], traj[8], traj[11]],
+                       [0, 0, 0, 1]])
+    return packed
+
 def TrajectoryGenerator(Tse_initial, Tsc_initial, Tsc_final, Tce_grasp, Tce_standoff, k):
     """generate the reference trajectory for the end-effector frame {e}.
 
@@ -154,8 +166,10 @@ def main():
                           [-1, 0, 0, 0],
                           [0, 0, 0, 1]])
     test = TrajectoryGenerator(Tse_initial, Tsc_initial, Tsc_final, Tce_grasp, Tce_standoff, 2)
+
+    print(pack_instance(test[0][:-1]))
     # print(test)
-    traj_to_csv(test, 'output.csv')
+    # traj_to_csv(test, 'output.csv')
 
 if __name__ == "__main__":
     main()
