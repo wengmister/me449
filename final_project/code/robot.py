@@ -75,6 +75,7 @@ class Robot:
         self.kp = np.eye(6) * 0.8
 
         self.xerr_history = []
+        self.qdot_history = []
         
     def plan_desired_trajectory(self):
 
@@ -139,12 +140,14 @@ class Robot:
 
             # find jacobian at this configuration and convert to joint values
             jac = self.find_jacobian()
+            # print(jac)
 
             # find the joint velocities
             q_dot = np.dot(np.linalg.pinv(jac), V_output) # 4x u then 5x thetadot
+            self.qdot_history.append(q_dot)
 
             # Find the next actual state
-            state_output = NextState(self.state_actual, q_dot, self.dt, 500)
+            state_output = NextState(self.state_actual[:-1], q_dot, self.dt, 500)
             state_output_with_gripper = np.append(state_output, self.desired_ee_trajectory[i][-1])
             self.states_planned.append(state_output_with_gripper)
             self.state_actual = state_output_with_gripper
@@ -164,9 +167,17 @@ if __name__=="__main__":
     plt.ylabel('error')
     plt.show()
 
-    last_five_columns = np.array(robot.states_planned)[:, -5:]
-    print(last_five_columns)
-    plt.plot(last_five_columns)
+    plt.subplot(2,1,1)
+    wheel_position_columns = np.array(robot.states_planned)[:, -5:-1]
+    print(wheel_position_columns)
+    plt.plot(wheel_position_columns)
+    plt.title("Position")
+
+    plt.subplot(2,1,2)
+    wheel_speed_columns = np.array(robot.qdot_history)[:, :4]
+    print(wheel_speed_columns)
+    plt.plot(wheel_speed_columns)
+    plt.title("Vel")
     plt.show()
 
     traj_to_csv(robot.xerr_history, 'x_err.csv')
