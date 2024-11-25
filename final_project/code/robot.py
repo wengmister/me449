@@ -20,6 +20,11 @@ class Robot:
                                     [-1, 0, 0, 0.5],
                                     [0, 0, 0, 1]])
         
+        self.Tce_grasp = np.array([[0, 0, 1, 0],
+                                    [0, 1, 0, 0],
+                                    [-1, 0, 0, -0.1],
+                                    [0, 0, 0, 1]])
+        
         self.Tb0 = np.array([[1, 0, 0, 0.1662],
                              [0, 1, 0, 0],
                              [0, 0, 1, 0.0026],
@@ -64,13 +69,13 @@ class Robot:
         self.actual_trajectory = []
 
         # youbot states
-        self.state_actual = [np.pi/4, 0, 0, 0, np.pi/6, 0, np.pi/10, 0, 0, 0, 0, 0, 0]
+        self.state_actual = [np.pi/4, -0.1, 0, 0, np.pi/10, -np.pi/2, np.pi/10, 0, 0, 0, 0, 0, 0]
         self.states_planned = []
         self.states_planned.append(self.state_actual)
 
         self.dt = 0.01
-        self.ki = np.zeros(6)
-        self.kp = np.zeros(6)
+        self.ki = np.eye(6)*0.2
+        self.kp = np.eye(6)
         
     def plan_desired_trajectory(self):
 
@@ -83,10 +88,7 @@ class Robot:
         planned_traj = TrajectoryGenerator(Tse_initial=self.Tse_initial, 
                                                       Tsc_initial=self.cube_initial, 
                                                       Tsc_final=self.cube_final, 
-                                                      Tce_grasp=np.array([[0, 0, 1, 0],
-                                                                         [0, 1, 0, 0],
-                                                                         [-1, 0, 0, 0],
-                                                                         [0, 0, 0, 1]]), 
+                                                      Tce_grasp=self.Tce_grasp,
                                                       Tce_standoff=np.array([[0, 0, 1, 0],
                                                                              [0, 1, 0, 0],
                                                                              [-1, 0, 0, 0.3],
@@ -95,6 +97,31 @@ class Robot:
         
         for i in planned_traj:
             self.desired_ee_trajectory.append(i)
+
+    def get_current_Tse(self):
+        # get Tse_current from actual state: Tsb @ Tb0 @ T0e
+        Tsb = mr.RpToTrans(R=mr.MatrixExp3(mr.VecToso3([0, 0, self.state_actual[0]])), p=np.array([self.state_actual[1],self.state_actual[2],0]))
+        Tb0 = self.Tb0
+        T0e = mr.FKinBody(self.M0e, self.Blist.T, self.state_actual[3:8])
+        Tse_current = np.dot(np.dot(Tsb, Tb0), T0e)
+        return Tse_current
+
+    def find_jacobian(self):
+        # find arm jacobian first
+        arm_angles = self.state_actual[3:8]
+        # print(f"arm angles: {arm_angles}")
+        jac_arm = mr.JacobianBody(self.Blist.T, np.array(arm_angles))
+
+        # find the base jacobian
+        # find ee in arm base frame
+        T0e = mr.FKinBody(self.M0e, self.Blist.T, arm_angles)
+
+        jac_base = np.dot(mr.Adjoint(np.dot(mr.TransInv(T0e), mr.TransInv(self.Tb0))), self.F6)
+        
+        #horizontally stack jacobians
+        jac = np.hstack([jac_base, jac_arm])
+
+        return jac
 
     def execute_trajectory(self):
         
@@ -116,36 +143,10 @@ class Robot:
             q_dot = np.dot(np.linalg.pinv(jac), V_output) # 4x u then 5x thetadot
 
             # Find the next actual state
-            state_output = NextState(self.state_actual, q_dot, self.dt, 10)
-            self.states_planned.append(state_output)
-            self.state_actual = state_output
-
-    def get_current_Tse(self):
-        # get Tse_current from actual state: Tsb @ Tb0 @ T0e
-        Tsb = mr.RpToTrans(R=mr.MatrixExp3(mr.VecToso3([0, 0, self.state_actual[0]])), p=np.array([self.state_actual[1],self.state_actual[2],0]))
-        Tb0 = self.Tb0
-        T0e = mr.FKinBody(self.M0e, self.Blist.T, self.state_actual[3:8])
-        Tse_current = np.dot(np.dot(Tsb, Tb0), T0e)
-        return Tse_current
-
-
-    def find_jacobian(self):
-        # find arm jacobian first
-        arm_angles = self.state_actual[3:8]
-        # print(f"arm angles: {arm_angles}")
-        jac_arm = mr.JacobianBody(self.Blist.T, np.array(arm_angles))
-
-        # find the base jacobian
-        # find ee in arm base frame
-        T0e = mr.FKinBody(self.M0e, self.Blist.T, arm_angles)
-
-        jac_base = np.dot(mr.Adjoint(np.dot(mr.TransInv(T0e), mr.TransInv(self.Tb0))), self.F6)
-        
-        #horizontally stack jacobians
-        jac = np.hstack([jac_base, jac_arm])
-
-        return jac
-
+            state_output = NextState(self.state_actual, q_dot, self.dt, 1000)
+            state_output_with_gripper = np.append(state_output, self.desired_ee_trajectory[i][-1])
+            self.states_planned.append(state_output_with_gripper)
+            self.state_actual = state_output_with_gripper
 
 
 if __name__=="__main__":
@@ -155,8 +156,9 @@ if __name__=="__main__":
     print(f"current Tse: {robot.get_current_Tse()}")
     print(f"current jacobian: {robot.find_jacobian()}")
 
-    print("Planned states:")
-    print(robot.states_planned)
-    traj_to_csv(robot.states_planned, 'output_states.csv')
+    traj_to_csv(robot.desired_ee_trajectory, 'desired.csv')
+    # print("Planned states:")
+    # print(robot.states_planned)
+    traj_to_csv(robot.states_planned, 'output.csv')
     # print(len(robot.desired_trajectory))
     # traj_to_csv(robot.desired_trajectory, 'output.csv')

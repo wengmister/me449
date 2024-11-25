@@ -67,14 +67,14 @@ def TrajectoryGenerator(Tse_initial, Tsc_initial, Tsc_final, Tce_grasp, Tce_stan
 
     fps = 0.01/k
     # Total frames = time / (0.01/k)
-    t_1 = 2
-    t_2 = 1
+    t_1 = 3
+    t_2 = 2
     t_3 = 0.7
-    t_4 = 1
-    t_5 = 2
-    t_6 = 1
+    t_4 = 2
+    t_5 = 3
+    t_6 = 2
     t_7 = 0.7
-    t_8 = 1
+    t_8 = 2
 
     # Move from initial configuration to standoff configuration
     packed_1 = mr.ScrewTrajectory(Tse_initial, Tse_standoff_init, t_1, t_1/fps, "quintic")

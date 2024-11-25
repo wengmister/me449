@@ -14,19 +14,19 @@ def NextState(current_config: np.array, joint_speeds: np.array, dt: float, max_s
         max_speeds (np.array): The maximum speed of each joint
 
     Returns:
-        np.array: The next state of the robot
+        np.array: The next state of the robot - 12 vector
     """
     # Extract the arm and wheel configuration
     arm_config = current_config[3:8]
-    print(f"arm_config={arm_config}")
+    # print(f"arm_config={arm_config}")
     wheel_config = current_config[-4:]
-    print(f"wheel_config={wheel_config}")
+    # print(f"wheel_config={wheel_config}")
 
     # Extract speeds
     arm_speeds = joint_speeds[-5:]
-    print(f"arm_speeds={arm_speeds}")
+    # print(f"arm_speeds={arm_speeds}")
     wheel_speeds = joint_speeds[:4]
-    print(f"wheel_speeds={wheel_speeds}")
+    # print(f"wheel_speeds={wheel_speeds}")
 
     # Check if speeds go beyond the maximum speed
     for i in range(len(arm_speeds)):
