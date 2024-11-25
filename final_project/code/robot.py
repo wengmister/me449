@@ -72,7 +72,7 @@ class Robot:
 
         self.dt = 0.01
         self.ki = np.eye(6)
-        self.kp = np.eye(6) * 0.8
+        self.kp = np.eye(6)
 
         self.xerr_history = []
         self.qdot_history = []
