@@ -3,6 +3,11 @@ from milestone2 import *
 from milestone3 import *
 from tqdm import tqdm
 
+"""
+Main module for ME449 Final Project.
+Example usage: in terminal, run `python3 robot.py`
+"""
+
 
 class Robot:
     def __init__(self):
@@ -15,43 +20,47 @@ class Robot:
                                     [-1, 0, 0, -1],
                                     [0, 0, 1, self.box_dim/2],
                                     [0, 0, 0, 1]])
-        
+
         self.Tse_initial = np.array([[0, 0, 1, 0],
                                     [0, 1, 0, 0],
                                     [-1, 0, 0, 0.5],
                                     [0, 0, 0, 1]])
-        
+
         self.Tce_grasp = np.array([[0, 0, 1, -0.01],
-                                    [0, 1, 0, 0.02],
-                                    [-1, 0, 0, -0.1],
-                                    [0, 0, 0, 1]])
-        
+                                   [0, 1, 0, 0.02],
+                                   [-1, 0, 0, -0.1],
+                                   [0, 0, 0, 1]])
+
         self.Tb0 = np.array([[1, 0, 0, 0.1662],
                              [0, 1, 0, 0],
                              [0, 0, 1, 0.0026],
                              [0, 0, 0, 1]])
-        
+
         self.M0e = np.array([[1, 0, 0, 0.033],
                              [0, 1, 0, 0],
                              [0, 0, 1, 0.6546],
                              [0, 0, 0, 1]])
-        
+
         self.Blist = np.array([[0, 0, 1, 0, 0.033, 0],
                                [0, -1, 0, -0.5076, 0, 0],
                                [0, -1, 0, -0.3526, 0, 0],
                                [0, -1, 0, -0.2176, 0, 0],
                                [0, 0, 1, 0, 0, 0]])
-        
+
         # base configs
         l = 0.47/2
         r = 0.0475
         w = 0.3/2
         gamma1 = -np.pi/4
         gamma2 = np.pi/4
-        h1 = np.array([1, np.tan(gamma1)]) @ np.array([[np.cos(0), np.sin(0)], [-np.sin(0), np.cos(0)]]) @ np.array([[-w, 1, 0],[l, 0, 1]])/r
-        h2 = np.array([1, np.tan(gamma2)]) @ np.array([[np.cos(0), np.sin(0)], [-np.sin(0), np.cos(0)]]) @ np.array([[w, 1, 0],[l, 0, 1]])/r
-        h3 = np.array([1, np.tan(gamma1)]) @ np.array([[np.cos(0), np.sin(0)], [-np.sin(0), np.cos(0)]]) @ np.array([[w, 1, 0],[-l, 0, 1]])/r
-        h4 = np.array([1, np.tan(gamma2)]) @ np.array([[np.cos(0), np.sin(0)], [-np.sin(0), np.cos(0)]]) @ np.array([[-w, 1, 0],[-l, 0, 1]])/r
+        h1 = np.array([1, np.tan(gamma1)]) @ np.array([[np.cos(0), np.sin(0)],
+                                                       [-np.sin(0), np.cos(0)]]) @ np.array([[-w, 1, 0], [l, 0, 1]])/r
+        h2 = np.array([1, np.tan(gamma2)]) @ np.array([[np.cos(0), np.sin(0)],
+                                                       [-np.sin(0), np.cos(0)]]) @ np.array([[w, 1, 0], [l, 0, 1]])/r
+        h3 = np.array([1, np.tan(gamma1)]) @ np.array([[np.cos(0), np.sin(0)],
+                                                       [-np.sin(0), np.cos(0)]]) @ np.array([[w, 1, 0], [-l, 0, 1]])/r
+        h4 = np.array([1, np.tan(gamma2)]) @ np.array([[np.cos(0), np.sin(0)],
+                                                       [-np.sin(0), np.cos(0)]]) @ np.array([[-w, 1, 0], [-l, 0, 1]])/r
         self.H0 = np.vstack([h1, h2, h3, h4])
         self.F3 = np.linalg.pinv(self.H0)
         # Expand self.F3 to a 6x4 matrix by padding with zeros
@@ -66,7 +75,8 @@ class Robot:
         self.actual_trajectory = []
 
         # youbot states
-        self.state_actual = [np.pi/4, -0.2, 0.1, 0, np.pi/10, -np.pi/2, np.pi/10, 0, 2, 2, 2, 2, 0]
+        self.state_actual = [np.pi/4, -0.2, 0.1, 0,
+                             np.pi/10, -np.pi/2, np.pi/10, 0, 2, 2, 2, 2, 0]
         self.states_planned = []
         self.states_planned.append(self.state_actual)
 
@@ -76,7 +86,7 @@ class Robot:
 
         self.xerr_history = []
         self.qdot_history = []
-        
+
     def plan_desired_trajectory(self):
 
         # # move from start configuration to initial configuration
@@ -85,22 +95,25 @@ class Robot:
         # for i in unpacked_1:
         #     self.desired_trajectory.append(i)
 
-        planned_traj = TrajectoryGenerator(Tse_initial=self.Tse_initial, 
-                                                      Tsc_initial=self.cube_initial, 
-                                                      Tsc_final=self.cube_final, 
-                                                      Tce_grasp=self.Tce_grasp,
-                                                      Tce_standoff=np.array([[0, 0, 1, 0],
-                                                                             [0, 1, 0, 0],
-                                                                             [-1, 0, 0, 0.3],
-                                                                             [0, 0, 0, 1]]), 
-                                                      k=1)
-        
+        planned_traj = TrajectoryGenerator(Tse_initial=self.Tse_initial,
+                                           Tsc_initial=self.cube_initial,
+                                           Tsc_final=self.cube_final,
+                                           Tce_grasp=self.Tce_grasp,
+                                           Tce_standoff=np.array([[0, 0, 1, 0],
+                                                                  [0, 1,
+                                                                   0, 0],
+                                                                  [-1, 0,
+                                                                   0, 0.3],
+                                                                  [0, 0, 0, 1]]),
+                                           k=1)
+
         for i in planned_traj:
             self.desired_ee_trajectory.append(i)
 
     def get_current_Tse(self):
         # get Tse_current from actual state: Tsb @ Tb0 @ T0e
-        Tsb = mr.RpToTrans(R=mr.MatrixExp3(mr.VecToso3([0, 0, self.state_actual[0]])), p=np.array([self.state_actual[1],self.state_actual[2],0]))
+        Tsb = mr.RpToTrans(R=mr.MatrixExp3(mr.VecToso3([0, 0, self.state_actual[0]])), p=np.array(
+            [self.state_actual[1], self.state_actual[2], 0]))
         Tb0 = self.Tb0
         T0e = mr.FKinBody(self.M0e, self.Blist.T, self.state_actual[3:8])
         Tse_current = np.dot(np.dot(Tsb, Tb0), T0e)
@@ -116,26 +129,29 @@ class Robot:
         # find ee in arm base frame
         T0e = mr.FKinBody(self.M0e, self.Blist.T, arm_angles)
 
-        jac_base = np.dot(mr.Adjoint(np.dot(mr.TransInv(T0e), mr.TransInv(self.Tb0))), self.F6)
-        
-        #horizontally stack jacobians
+        jac_base = np.dot(mr.Adjoint(
+            np.dot(mr.TransInv(T0e), mr.TransInv(self.Tb0))), self.F6)
+
+        # horizontally stack jacobians
         jac = np.hstack([jac_base, jac_arm])
 
         return jac
 
     def execute_trajectory(self):
-        
+
         for i in tqdm(range(len(self.desired_ee_trajectory)-1)):
             # print(i)
 
             # perform feedback control to get 6vector twist
-            V_output, xerr_i = FeedbackControl(X= self.get_current_Tse(),
-                                        X_d=pack_instance(self.desired_ee_trajectory[i][:-1]), 
-                                        X_d_next=pack_instance(self.desired_ee_trajectory[i+1][:-1]), 
-                                        K_p=self.kp, 
-                                        K_i=self.ki,
-                                        dt=self.dt)
-            
+            V_output, xerr_i = FeedbackControl(X=self.get_current_Tse(),
+                                               X_d=pack_instance(
+                self.desired_ee_trajectory[i][:-1]),
+                X_d_next=pack_instance(
+                self.desired_ee_trajectory[i+1][:-1]),
+                K_p=self.kp,
+                K_i=self.ki,
+                dt=self.dt)
+
             self.xerr_history.append(xerr_i)
 
             # find jacobian at this configuration and convert to joint values
@@ -143,17 +159,20 @@ class Robot:
             # print(jac)
 
             # find the joint velocities
-            q_dot = np.dot(np.linalg.pinv(jac), V_output) # 4x u then 5x thetadot
+            # 4x u then 5x thetadot
+            q_dot = np.dot(np.linalg.pinv(jac), V_output)
             self.qdot_history.append(q_dot)
 
             # Find the next actual state
-            state_output = NextState(self.state_actual[:-1], q_dot, self.dt, 500)
-            state_output_with_gripper = np.append(state_output, self.desired_ee_trajectory[i][-1])
+            state_output = NextState(
+                self.state_actual[:-1], q_dot, self.dt, 500)
+            state_output_with_gripper = np.append(
+                state_output, self.desired_ee_trajectory[i][-1])
             self.states_planned.append(state_output_with_gripper)
             self.state_actual = state_output_with_gripper
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     robot = Robot()
     robot.plan_desired_trajectory()
     robot.execute_trajectory()
@@ -167,13 +186,13 @@ if __name__=="__main__":
     plt.ylabel('error')
     plt.show()
 
-    plt.subplot(2,1,1)
+    plt.subplot(2, 1, 1)
     wheel_position_columns = np.array(robot.states_planned)[:, -5:-1]
     print(wheel_position_columns)
     plt.plot(wheel_position_columns)
     plt.title("Position")
 
-    plt.subplot(2,1,2)
+    plt.subplot(2, 1, 2)
     wheel_speed_columns = np.array(robot.qdot_history)[:, :4]
     print(wheel_speed_columns)
     plt.plot(wheel_speed_columns)

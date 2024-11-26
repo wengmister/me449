@@ -2,6 +2,7 @@ import modern_robotics as mr
 import numpy as np
 np.set_printoptions(precision=4)
 
+
 def NextState(current_config: np.array, joint_speeds: np.array, dt: float, max_speed: float) -> np.array:
     """Compute the next state of the robot
 
@@ -34,7 +35,7 @@ def NextState(current_config: np.array, joint_speeds: np.array, dt: float, max_s
             arm_speeds[i] = max_speed
         if arm_speeds[i] < -max_speed:
             arm_speeds[i] = -max_speed
-    
+
     for i in range(len(wheel_speeds)):
         if wheel_speeds[i] > max_speed:
             wheel_speeds[i] = max_speed
@@ -48,10 +49,12 @@ def NextState(current_config: np.array, joint_speeds: np.array, dt: float, max_s
     next_arm_config = arm_config + arm_speeds * dt
     next_wheel_config = wheel_config + wheel_speeds * dt
     next_chassis_config = current_config[:3] + odometry_update * dt
-    
-    next_state = np.concatenate([next_chassis_config, next_arm_config, next_wheel_config])
+
+    next_state = np.concatenate(
+        [next_chassis_config, next_arm_config, next_wheel_config])
 
     return next_state
+
 
 def compute_odometry(wheel_speeds: np.array) -> np.array:
     """Compute the odometry of the robot
@@ -67,18 +70,23 @@ def compute_odometry(wheel_speeds: np.array) -> np.array:
     w = 0.3/2
     gamma1 = -np.pi/4
     gamma2 = np.pi/4
-    h1 = np.array([1, np.tan(gamma1)]) @ np.array([[np.cos(0), np.sin(0)], [-np.sin(0), np.cos(0)]]) @ np.array([[-w, 1, 0],[l, 0, 1]])/r
-    h2 = np.array([1, np.tan(gamma2)]) @ np.array([[np.cos(0), np.sin(0)], [-np.sin(0), np.cos(0)]]) @ np.array([[w, 1, 0],[l, 0, 1]])/r
-    h3 = np.array([1, np.tan(gamma1)]) @ np.array([[np.cos(0), np.sin(0)], [-np.sin(0), np.cos(0)]]) @ np.array([[w, 1, 0],[-l, 0, 1]])/r
-    h4 = np.array([1, np.tan(gamma2)]) @ np.array([[np.cos(0), np.sin(0)], [-np.sin(0), np.cos(0)]]) @ np.array([[-w, 1, 0],[-l, 0, 1]])/r
+    h1 = np.array([1, np.tan(gamma1)]) @ np.array([[np.cos(0), np.sin(0)],
+                                                   [-np.sin(0), np.cos(0)]]) @ np.array([[-w, 1, 0], [l, 0, 1]])/r
+    h2 = np.array([1, np.tan(gamma2)]) @ np.array([[np.cos(0), np.sin(0)],
+                                                   [-np.sin(0), np.cos(0)]]) @ np.array([[w, 1, 0], [l, 0, 1]])/r
+    h3 = np.array([1, np.tan(gamma1)]) @ np.array([[np.cos(0), np.sin(0)],
+                                                   [-np.sin(0), np.cos(0)]]) @ np.array([[w, 1, 0], [-l, 0, 1]])/r
+    h4 = np.array([1, np.tan(gamma2)]) @ np.array([[np.cos(0), np.sin(0)],
+                                                   [-np.sin(0), np.cos(0)]]) @ np.array([[-w, 1, 0], [-l, 0, 1]])/r
     H0 = np.vstack([h1, h2, h3, h4])
     theta_del = wheel_speeds.T
     V_b = np.linalg.pinv(H0) @ theta_del
 
+    return np.array([V_b[0], V_b[1], V_b[2]])  # V_b = [w_z, v_x, v_y]
 
-    return np.array([V_b[0], V_b[1], V_b[2]]) # V_b = [w_z, v_x, v_y]
 
 if __name__ == "__main__":
     # Test the NextState function
-    test_speed = np.array([-10,10,-10,10])
-    print(f"testing odom with input {test_speed}: {compute_odometry(test_speed)}")
+    test_speed = np.array([-10, 10, -10, 10])
+    print(f"testing odom with input {test_speed}: {
+          compute_odometry(test_speed)}")

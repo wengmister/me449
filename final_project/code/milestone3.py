@@ -1,6 +1,7 @@
 import modern_robotics as mr
 import numpy as np
 
+
 def FeedbackControl(X, X_d, X_d_next, K_p, K_i, dt):
     """
     Compute the feedback control for the robot.
@@ -24,13 +25,14 @@ def FeedbackControl(X, X_d, X_d_next, K_p, K_i, dt):
     V_d = mr.se3ToVec(mr.MatrixLog6(np.dot(mr.TransInv(X_d), X_d_next))) / dt
     # print(f"V_d={V_d}")
 
-    # Compute the feedforward 
+    # Compute the feedforward
     ff_adj = mr.Adjoint(np.dot(mr.TransInv(X), X_d))
 
     # Compute the control output
     V = np.dot(ff_adj, V_d) + np.dot(K_p, X_err) + np.dot(K_i, X_err * dt)
-    
+
     return V, X_err
+
 
 if __name__ == "__main__":
     # Define the current configuration
